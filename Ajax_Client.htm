@@ -1,0 +1,48 @@
+<html>
+	<head>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	</head>
+	<body>
+		<div id="time">t</div>
+	</body>
+	<script>
+		var xmlhttp;
+		function myajax(url,cfunc)
+		{
+			if (window.XMLHttpRequest)
+			{ // IE7+, Firefox, Chrome, Opera, Safari
+				xmlhttp = new XMLHttpRequest();
+			}
+			else
+			{ // IE6, IE5
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			xmlhttp.onreadystatechange = cfunc;
+			xmlhttp.open("GET",url,true);
+			xmlhttp.send();
+		}
+		function flash()
+		{
+			myajax("Ajax_Server.php", function(){
+				document.getElementById("time").innerHTML = xmlhttp.responseText;
+			});
+			setTimeout("flash()", 100);
+		}
+		/* function flash()
+		{
+			var ele = document.getElementById("time");
+			$.ajax({url: "Ajax_Server.php",
+				type: "POST", // or GET
+				success: function(result){
+					ele.innerHTML = result;
+				},
+				error: function()
+				{
+					ele.innerHTML = "failed";
+				}
+			});
+			setTimeout("flash()", 100);
+		} */
+		flash();
+	</script>
+</html>

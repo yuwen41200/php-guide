@@ -1,3 +1,3 @@
 <?php
-	echo date("y/m/d h:m:sa");
+	echo date('Y/m/d H:i:s');
 ?>

@@ -1,1 +1,1 @@
-Useful PHP Code Fragments
+Useful PHP Code Snippet

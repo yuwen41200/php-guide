@@ -1,4 +1,5 @@
 <?php
+	session_start();
 	if(isset($_POST['logout']) && $_POST['logout']=="true") {
 		unset($_SESSION['LoginUser']);
 		header('Location: index.php');

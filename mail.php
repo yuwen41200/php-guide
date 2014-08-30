@@ -34,7 +34,7 @@
 			$Body .= '<br/><p>本信由系統自動寄出，若您不曾報名本活動，或以上資料有誤，請回覆此信告知我們。</p>';
 			$Header = "MIME-Version: 1.0\r\n". "Content-type: text/html; charset=UTF-8\r\n". "From:<ckefgisc17@gmail.com>\r\n";
 			mail($To, $Subject, $Body, $Header);
-			header('Location: signup.php?apply=true');
+			header('Location: mail.php?apply=true');
 			exit();
 		}
 	}

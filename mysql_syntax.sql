@@ -24,8 +24,10 @@ CREATE TABLE `table` (
 ) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_unicode_ci;
 
 -- EDIT A COLUMN (like the way you create it)
-ALTER TABLE `table` MODIFY `sometext` VARCHAR(20) NOT NULL DEFAULT '7122'; 
+ALTER TABLE `table` MODIFY `somestring` VARCHAR(20) NOT NULL DEFAULT '7122'; 
 
+-- DROP A COLUMN 
+ALTER TABLE `table` DROP `somestring`;
 
 -- DESCRIBE Syntax
 DESCRIBE `table`;

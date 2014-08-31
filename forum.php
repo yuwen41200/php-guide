@@ -41,8 +41,6 @@
 	}
 	$query = "SELECT * FROM topic ORDER BY tIndex DESC";
 	$tResult = $connect->query($query) or die('Error: '.$connect->error);
-	$query = "SELECT * FROM reply ORDER BY rIndex DESC";
-	$rResult = $connect->query($query) or die('Error: '.$connect->error);
 ?>
 <!DOCTYPE html>
 <html>
@@ -54,11 +52,13 @@
 			<p><?php echo $tRow['tName']; ?></p>
 			<p><?php echo $tRow['tTime']; ?></p>
 			<h2>Reply</h2>
-			<?php while($rRow = $rResult->fetch_assoc()) { if($tRow['tIndex'] == $rRow['rtIndex']) { ?>
+			<?php $query = sprintf("SELECT * FROM reply WHERE rtIndex = %d ORDER BY rIndex DESC", SQLValue($tRow['tIndex'], "int"));
+			$rResult = $connect->query($query) or die('Error: '.$connect->error);
+			while($rRow = $rResult->fetch_assoc()) { ?>
 				<p><?php echo $rRow['rContent']; ?></p>
 				<p><?php echo $rRow['rName']; ?></p>
 				<p><?php echo $rRow['rTime']; ?></p>
-			<?php } } if($rResult->num_rows != 0) $rResult->data_seek(0); ?>
+			<?php } $rResult->close(); ?>
 			<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
 				<p><input type="text" name="rContent" value="<?php if($tRow['tIndex'] == $_POST['rtIndex']) echo $_POST['rContent']; ?>"/></p>
 				<p><input type="text" name="rName" value="<?php if($tRow['tIndex'] == $_POST['rtIndex']) echo $_POST['rName']; ?>"/></p>
@@ -71,5 +71,4 @@
 </html>
 <?php
 	$tResult->close();
-	$rResult->close();
 ?>

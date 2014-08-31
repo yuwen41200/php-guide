@@ -42,6 +42,7 @@
 	$number_2 = rand(1, 9);
 	$answer = substr(md5($number_1+$number_2), 5, 10);
 ?>
+<!DOCTYPE html>
 <html>
 	<body>
 		<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
@@ -60,7 +61,7 @@
 			<p><?php echo $number_1." + ".$number_2." = ?" ?><input type="text" name="captcha"/></p>
 			<input type="hidden" name="answer" value="<?php echo $answer; ?>"/>
 			<?php echo $notice; ?>
-			<p><input type="submit" value="Send"></p>
+			<p><input type="submit" value="Send"/></p>
 		</form>
 	</body>
 </html>

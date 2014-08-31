@@ -2,6 +2,7 @@
 	require_once('connect.php');
 	if(!function_exists('SQLValue')) {
 		function SQLValue($value, $type) {
+			global $connect;
 			$value = htmlentities($value, ENT_QUOTES, 'UTF-8');
 			$value = $connect->real_escape_string($value);
 			switch($type) {
@@ -45,13 +46,14 @@
 		}
 	}
 ?>
+<!DOCTYPE html>
 <html>
 	<body>
 		<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post" enctype="multipart/form-data">
 			<p><input type="text" name="filename" value="<?php if(isset($_POST['filename'])) echo $_POST['filename']; ?>"/></p>
 			<p><input type="file" name="uploadedFile"/></p>
 			<?php echo $notice; ?>
-			<p><input type="submit" value="Upload"></p>
+			<p><input type="submit" value="Upload"/></p>
 		</form>
 	</body>
 </html>

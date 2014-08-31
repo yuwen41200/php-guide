@@ -2,6 +2,7 @@
 	require_once('connect.php');
 	if(!function_exists('SQLValue')) {
 		function SQLValue($value, $type) {
+			global $connect;
 			$value = htmlentities($value, ENT_QUOTES, 'UTF-8');
 			$value = $connect->real_escape_string($value);
 			switch($type) {
@@ -43,6 +44,7 @@
 	$query = "SELECT * FROM reply ORDER BY rIndex DESC";
 	$rResult = $connect->query($query) or die('Error: '.$connect->error);
 ?>
+<!DOCTYPE html>
 <html>
 	<body>
 		<?php while($tRow = $tResult->fetch_assoc()) { ?>
@@ -61,7 +63,7 @@
 				<p><input type="text" name="rContent" value="<?php if($tRow['tIndex'] == $_POST['rtIndex']) echo $_POST['rContent']; ?>"/></p>
 				<p><input type="text" name="rName" value="<?php if($tRow['tIndex'] == $_POST['rtIndex']) echo $_POST['rName']; ?>"/></p>
 				<?php if($tRow['tIndex'] == $_POST['rtIndex']) echo $notice; ?>
-				<p><input type="submit" value="Send"></p>
+				<p><input type="submit" value="Send"/></p>
 				<input type="hidden" name="rtIndex" value="<?php echo $tRow['tIndex']; ?>"/>
 			</form>
 		<?php } ?>

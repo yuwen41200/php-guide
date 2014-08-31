@@ -2,6 +2,7 @@
 	require_once('connect.php');
 	if(!function_exists('SQLValue')) {
 		function SQLValue($value, $type) {
+			global $connect;
 			$value = htmlentities($value, ENT_QUOTES, 'UTF-8');
 			$value = $connect->real_escape_string($value);
 			switch($type) {

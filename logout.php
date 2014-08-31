@@ -6,11 +6,12 @@
 		exit();
 	}
 ?>
+<!DOCTYPE html>
 <html>
 	<body>
 		<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
 			<p><?php echo $_SESSION['LoginUser']; ?></p>
-			<p><input type="submit" value="Logout"></p>
+			<p><input type="submit" value="Logout"/></p>
 			<input type="hidden" name="logout" value="true"/>
 		</form>
 	</body>

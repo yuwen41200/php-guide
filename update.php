@@ -2,6 +2,7 @@
 	require_once('connect.php');
 	if(!function_exists('SQLValue')) {
 		function SQLValue($value, $type) {
+			global $connect;
 			$value = htmlentities($value, ENT_QUOTES, 'UTF-8');
 			$value = $connect->real_escape_string($value);
 			switch($type) {
@@ -46,13 +47,14 @@
 	if(empty($row))
 		die('Error: Invalid Query String');
 ?>
+<!DOCTYPE html>
 <html>
 	<body>
 		<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
 			<p><input type="text" name="column2" value="<?php if(isset($_POST['column2'])) echo $_POST['column2']; else echo $row['column2']; ?>"/></p>
 			<p><textarea name="column3"><?php if(isset($_POST['column3'])) echo $_POST['column3']; else echo $row['column3']; ?></textarea></p>
 			<?php echo $notice; ?>
-			<p><input type="submit" value="Update"></p>
+			<p><input type="submit" value="Update"/></p>
 			<input type="hidden" name="column1" value="<?php echo $row['column1']; ?>"/>
 		</form>
 	</body>

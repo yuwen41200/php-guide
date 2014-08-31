@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 	<head>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -23,7 +24,7 @@
 		}
 		function flash()
 		{
-			myajax("Ajax_Server.php", function() {
+			myajax("ajax_server.php", function() {
 				document.getElementById("time").innerHTML = xmlhttp.responseText;
 			});
 			setTimeout("flash()", 100);
@@ -31,7 +32,7 @@
 		/* function flash()
 		{
 			var ele = document.getElementById("time");
-			$.ajax({url: "Ajax_Server.php",
+			$.ajax({url: "ajax_server.php",
 				type: "POST", // or GET
 				success: function(result) {
 					ele.innerHTML = result;

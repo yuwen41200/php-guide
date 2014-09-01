@@ -20,7 +20,7 @@ CREATE TABLE `table` (
 	`sometext` TEXT NOT NULL,
 	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
     `updated_at` DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-	PRIMARY KEY (`column1`)
+	PRIMARY KEY (`id`)
 ) ENGINE = MyISAM DEFAULT CHARACTER SET = utf8 COLLATE = utf8_unicode_ci;
 
 -- EDIT A COLUMN (like the way you create it)

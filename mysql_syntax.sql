@@ -89,4 +89,4 @@ SELECT @var;
 CREATE FUNCTION sample (num INT, str VARCHAR(20))
 RETURNS VARCHAR(50) DETERMINISTIC
 	RETURN CONCAT(CAST(num AS CHAR), ' Hello, ', str);
-SELECT hello(1, 'world');
+SELECT sample(1, 'world');

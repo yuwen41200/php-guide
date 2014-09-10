@@ -64,3 +64,29 @@ DROP TABLE `table`;
 
 -- DROP DATABASE Syntax
 DROP DATABASE `database`;
+
+-- CREATE PROCEDURE Syntax
+delimiter //
+CREATE PROCEDURE sample (param1 INT, param2 INT)
+BEGIN
+	DECLARE num INT DEFAULT 20;
+	SET @var = param1 * param2;
+	IF @var < 10 THEN
+		SET @var = 10;
+	ELSEIF var > 100 THEN
+		SET @var = 100;
+	ELSE
+		REPEAT
+			SET @var = @var + 1;
+		UNTIL @var > num END REPEAT;
+	END IF;
+END//
+delimiter ;
+CALL sample(6, 2);
+SELECT @var;
+
+-- CREATE FUNCTION Syntax
+CREATE FUNCTION sample (num INT, str VARCHAR(20))
+RETURNS VARCHAR(50) DETERMINISTIC
+	RETURN CONCAT(CAST(num AS CHAR), ' Hello, ', str);
+SELECT hello(1, 'world');

@@ -38,9 +38,10 @@ class Database
     }
 }
 
-$db = new Database("localhost", "root", "yourpassword", "database_name");
-$db->connect();
-$db->sql->query("show tables;");
-$db->reconnect();
+#usage
+#$db = new Database("localhost", "root", "yourpassword", "database_name");
+#$db->connect();
+#$db->sql->query("show tables;");
+#$db->reconnect();
 
 ?>

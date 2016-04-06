@@ -5,10 +5,10 @@
 #              total       used       free     shared    buffers     cached
 # Mem:          3.7G       2.6G       1.1G       257M       108M       1.4G
 # -/+ buffers/cache:       1.1G       2.7G
-# 置換：        1.9G       642M       1.2G
+# 置換：         1.9G       642M       1.2G
 # 
 # $ df -h
-# 檔案系統         容量  已用  可用 已用% 掛載點
+# 檔案系統          容量   已用  可用  已用% 掛載點
 # udev            1.9G     0  1.9G    0% /dev
 # tmpfs           384M  6.4M  378M    2% /run
 # /dev/sda6       183G   45G  130G   26% /
@@ -21,7 +21,7 @@
 # 
 # $ mysql -u root -p --local-infile
 
-# Q0 Import the datasets.
+# Q0 - Import the datasets.
 
 SHOW DATABASES;
 USE assignments;
@@ -115,3 +115,14 @@ LOAD DATA LOCAL INFILE '/tmp/airports.csv'
 	IGNORE 1 LINES;
 -- Query OK, 3376 rows affected (0.78 sec)
 -- Records: 3376  Deleted: 0  Skipped: 0  Warnings: 0
+
+# Q1 - Please list the number of all different route (origin -> destination)
+#      and contain “DISTINCT” syntax in usage of SQL.
+
+SELECT COUNT(*) FROM (SELECT DISTINCT Origin, Dest FROM ontime) AS temp;
+-- +----------+
+-- | COUNT(*) |
+-- +----------+
+-- |     6901 |
+-- +----------+
+-- 1 row in set (2 min 1.59 sec)

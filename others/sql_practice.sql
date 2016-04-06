@@ -116,8 +116,8 @@ LOAD DATA LOCAL INFILE '/tmp/airports.csv'
 -- Query OK, 3376 rows affected (0.78 sec)
 -- Records: 3376  Deleted: 0  Skipped: 0  Warnings: 0
 
-# Q1 - Please list the number of all different route (origin -> destination)
-#      and contain “DISTINCT” syntax in usage of SQL.
+# Q1 - Please list the number of all different routes (origin -> destination)
+#      and contain “DISTINCT” syntax in the usage of SQL.
 
 SELECT COUNT(*) FROM (SELECT DISTINCT Origin, Dest FROM ontime) AS temp;
 -- +----------+
@@ -126,3 +126,16 @@ SELECT COUNT(*) FROM (SELECT DISTINCT Origin, Dest FROM ontime) AS temp;
 -- |     6901 |
 -- +----------+
 -- 1 row in set (2 min 1.59 sec)
+
+# Q2 - Please list the number of flights whose destination is JFK
+#      and the actual flight time is between 1 to 3 hours
+#      and contain “BETWEEN” syntax in the usage of SQL.
+
+SELECT COUNT(*) FROM ontime WHERE
+	Dest = 'JFK' AND (ActualElapsedTime BETWEEN 1 AND 3);
+-- +----------+
+-- | COUNT(*) |
+-- +----------+
+-- |        1 |
+-- +----------+
+-- 1 row in set (6.08 sec)

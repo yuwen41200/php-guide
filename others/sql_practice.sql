@@ -88,7 +88,7 @@ ALTER TABLE ontime ADD INDEX Dest (Dest);
 -- Query OK, 0 rows affected (6 min 38.85 sec)
 -- Records: 0  Duplicates: 0  Warnings: 0
 CREATE TABLE plane (
-	Tailnum VARCHAR(7), Type VARCHAR(19), Manufacturer VARCHAR(30), IssueDate DATE,
+	TailNum VARCHAR(7), Type VARCHAR(19), Manufacturer VARCHAR(30), IssueDate DATE,
 	Model VARCHAR(17), Status VARCHAR(17), AircraftType VARCHAR(24),
 	EngineType VARCHAR(13), Year INT
 );
@@ -97,7 +97,21 @@ LOAD DATA LOCAL INFILE '/tmp/plane-data.csv'
 	INTO TABLE plane
 	FIELDS TERMINATED BY ','
 	LINES TERMINATED BY '\n'
-	IGNORE 1 LINES;
--- Query OK, 5029 rows affected, 9017 warnings (3.01 sec)
--- Records: 5029  Deleted: 0  Skipped: 0  Warnings: 9017
+	IGNORE 1 LINES
+	(TailNum, Type, Manufacturer, @var, Model, Status, AircraftType, EngineType, Year)
+	SET IssueDate = STR_TO_DATE(@var, '%m/%d/%Y');
+-- Query OK, 5029 rows affected, 3989 warnings (1.66 sec)
+-- Records: 5029  Deleted: 0  Skipped: 0  Warnings: 3989
 SHOW WARNINGS LIMIT 10;
+CREATE TABLE airport (
+	Iata VARCHAR(4), Airport VARCHAR(41), City VARCHAR(33), State VARCHAR(2),
+	Country VARCHAR(30), Lat NUMERIC(11, 8), Lon NUMERIC(12, 8)
+);
+SHOW FULL COLUMNS FROM airport;
+LOAD DATA LOCAL INFILE '/tmp/airports.csv'
+	INTO TABLE airport
+	FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+	LINES TERMINATED BY '\n'
+	IGNORE 1 LINES;
+-- Query OK, 3376 rows affected (0.78 sec)
+-- Records: 3376  Deleted: 0  Skipped: 0  Warnings: 0

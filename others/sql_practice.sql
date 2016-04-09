@@ -218,3 +218,9 @@ SELECT plane.Model, AVG(ontime.Distance/ontime.ActualElapsedTime) AS AvgSpeed
 #      by the timezone count of routes (assume one timezone is formed by 15 degree
 #      longitude and is not related to countries) in decreasing order
 #      and contain “ORDER BY” in the usage of SQL.
+
+SELECT ABS(temp1.Lon-temp2.Lon)/15 AS Timezone, ontime.Origin, ontime.Dest FROM ontime
+	INNER JOIN airport AS temp1 ON ontime.Origin = temp1.Iata
+	INNER JOIN airport AS temp2 ON ontime.Dest = temp2.Iata
+	ORDER BY Timezone DESC, ontime.Origin ASC, ontime.Dest ASC
+	LIMIT 0, 50;

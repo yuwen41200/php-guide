@@ -140,60 +140,81 @@ SELECT COUNT(*) FROM ontime WHERE
 -- +----------+
 -- 1 row in set (6.08 sec)
 
-# Q3 - Please list both the aircraft type name and the amount
+# Q3 - Please list both the aircraft type names and the amounts
 #      whose aircraft type name begins with “737”
 #      and contain “LIKE” syntax in the usage of SQL.
 
-SELECT Model, COUNT(*) FROM plane WHERE Model LIKE '737%' GROUP BY Model;
--- +-----------+----------+
--- | Model     | COUNT(*) |
--- +-----------+----------+
--- | 737-230   |        1 |
--- | 737-236   |        4 |
--- | 737-282   |        1 |
--- | 737-282C  |        1 |
--- | 737-2P6   |        1 |
--- | 737-2X6C  |        1 |
--- | 737-2Y5   |        1 |
--- | 737-301   |        7 |
--- | 737-317   |        4 |
--- | 737-322   |       64 |
--- | 737-33A   |        4 |
--- | 737-3A4   |        9 |
--- | 737-3B7   |       16 |
--- | 737-3G7   |       20 |
--- | 737-3H4   |      147 |
--- | 737-3K2   |        2 |
--- | 737-3L9   |        2 |
--- | 737-3Q8   |        9 |
--- | 737-3S3   |        4 |
--- | 737-3T5   |        3 |
--- | 737-3TO   |       50 |
--- | 737-3Y0   |        6 |
--- | 737-401   |       13 |
--- | 737-490   |       16 |
--- | 737-4B7   |       27 |
--- | 737-4Q8   |       22 |
--- | 737-4S3   |        1 |
--- | 737-522   |       30 |
--- | 737-524   |       56 |
--- | 737-5H4   |       25 |
--- | 737-705   |        1 |
--- | 737-724   |       36 |
--- | 737-73A   |        2 |
--- | 737-76N   |       27 |
--- | 737-76Q   |        2 |
--- | 737-790   |       19 |
--- | 737-7AD   |        1 |
--- | 737-7BD   |       32 |
--- | 737-7H4   |      308 |
--- | 737-7Q8   |        2 |
--- | 737-824   |      100 |
--- | 737-832   |       68 |
--- | 737-890   |       33 |
--- | 737-8FH   |        1 |
--- | 737-924   |       12 |
--- | 737-924ER |        8 |
--- | 737-990   |       12 |
--- +-----------+----------+
--- 47 rows in set (0.06 sec)
+SELECT Model, COUNT(Model) FROM plane WHERE Model LIKE '737%' GROUP BY Model;
+-- +-----------+--------------+
+-- | Model     | COUNT(Model) |
+-- +-----------+--------------+
+-- | 737-230   |            1 |
+-- | 737-236   |            4 |
+-- | 737-282   |            1 |
+-- | 737-282C  |            1 |
+-- | 737-2P6   |            1 |
+-- | 737-2X6C  |            1 |
+-- | 737-2Y5   |            1 |
+-- | 737-301   |            7 |
+-- | 737-317   |            4 |
+-- | 737-322   |           64 |
+-- | 737-33A   |            4 |
+-- | 737-3A4   |            9 |
+-- | 737-3B7   |           16 |
+-- | 737-3G7   |           20 |
+-- | 737-3H4   |          147 |
+-- | 737-3K2   |            2 |
+-- | 737-3L9   |            2 |
+-- | 737-3Q8   |            9 |
+-- | 737-3S3   |            4 |
+-- | 737-3T5   |            3 |
+-- | 737-3TO   |           50 |
+-- | 737-3Y0   |            6 |
+-- | 737-401   |           13 |
+-- | 737-490   |           16 |
+-- | 737-4B7   |           27 |
+-- | 737-4Q8   |           22 |
+-- | 737-4S3   |            1 |
+-- | 737-522   |           30 |
+-- | 737-524   |           56 |
+-- | 737-5H4   |           25 |
+-- | 737-705   |            1 |
+-- | 737-724   |           36 |
+-- | 737-73A   |            2 |
+-- | 737-76N   |           27 |
+-- | 737-76Q   |            2 |
+-- | 737-790   |           19 |
+-- | 737-7AD   |            1 |
+-- | 737-7BD   |           32 |
+-- | 737-7H4   |          308 |
+-- | 737-7Q8   |            2 |
+-- | 737-824   |          100 |
+-- | 737-832   |           68 |
+-- | 737-890   |           33 |
+-- | 737-8FH   |            1 |
+-- | 737-924   |           12 |
+-- | 737-924ER |            8 |
+-- | 737-990   |           12 |
+-- +-----------+--------------+
+-- 47 rows in set (0.00 sec)
+
+# Q4 - Please list the average speed (using the actual arrival time)
+#      of all aircraft types and contain “AVG” in the usage of SQL.
+#
+# The data are too huge for my computer (Intel Pentium 2020M with 4GB RAM) to process.
+# I had executed this query for more than 30 minutes.
+
+ALTER TABLE ontime ADD INDEX TailNum (TailNum);
+-- Query OK, 0 rows affected (7 min 27.65 sec)
+-- Records: 0  Duplicates: 0  Warnings: 0
+SELECT plane.Model, AVG(ontime.Distance/ontime.ActualElapsedTime) AS AvgSpeed
+	FROM plane INNER JOIN ontime ON plane.TailNum = ontime.TailNum
+	GROUP BY plane.Model;
+-- ^CCtrl-C -- sending "KILL QUERY 5" to server ...
+-- Ctrl-C -- query aborted.
+-- ERROR 1317 (70100): Query execution was interrupted
+
+# Q5 - Please list the top 50 timezone counts and routes (origin -> destination)
+#      by the timezone count of routes (assume one timezone is formed by 15 degree
+#      longitude and is not related to countries) in decreasing order
+#      and contain “ORDER BY” in the usage of SQL.

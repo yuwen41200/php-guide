@@ -237,6 +237,10 @@ SELECT DISTINCT
 
 # Q6 - Please list the aircraft types which never appeared after 2008 (appeared before)
 #      and contain “NOT IN” syntax in the usage of SQL.
+# 
+# Please note that not all plane data are in the "plane" table.
+# So it is possible to receive nothing
+# when we tries to find out their aircraft type names.
 
 SELECT DISTINCT plane.Model FROM plane
 	INNER JOIN ontime ON plane.TailNum = ontime.TailNum
@@ -273,6 +277,8 @@ SELECT plane.Manufacturer, AVG(ontime.ArrDelay)
 # Q8 - Please list the average delay time of a week (7 days) and
 #      a day (24 hours), and when is the best time to fly
 #      (having the minimum delay).
+# 
+# The best day is Friday (day 6) and the best hour is 5 o'clock.
 
 SELECT DayOfWeek, AVG(ArrDelay) FROM ontime GROUP BY DayOfWeek;
 -- +-----------+---------------+
@@ -287,6 +293,81 @@ SELECT DayOfWeek, AVG(ArrDelay) FROM ontime GROUP BY DayOfWeek;
 -- |         7 |        7.9931 |
 -- +-----------+---------------+
 -- 7 rows in set (1 min 52.20 sec)
+SELECT FLOOR(CRSDepTime/100) AS Hour, AVG(ArrDelay) FROM ontime GROUP BY Hour;
+-- +------+---------------+
+-- | Hour | AVG(ArrDelay) |
+-- +------+---------------+
+-- |    0 |        2.6160 |
+-- |    1 |        1.6824 |
+-- |    2 |        0.9439 |
+-- |    3 |        8.8009 |
+-- |    4 |        4.0973 |
+-- |    5 |       -0.1883 |
+-- |    6 |        0.1889 |
+-- |    7 |        1.2136 |
+-- |    8 |        2.4943 |
+-- |    9 |        3.4210 |
+-- |   10 |        4.4658 |
+-- |   11 |        5.3243 |
+-- |   12 |        6.4725 |
+-- |   13 |        8.4028 |
+-- |   14 |        9.9337 |
+-- |   15 |       11.1849 |
+-- |   16 |       12.3410 |
+-- |   17 |       14.1203 |
+-- |   18 |       14.4066 |
+-- |   19 |       14.6210 |
+-- |   20 |       14.3945 |
+-- |   21 |       12.7192 |
+-- |   22 |        8.7032 |
+-- |   23 |        6.3922 |
+-- +------+---------------+
+-- 24 rows in set (1 min 49.76 sec)
+
+# Q9 - Do older planes suffer more delay?
+# 
+# No. As the following tables show, there is no positive correlation
+# between the age of the plane and its delay.
+
+SELECT DATEDIFF(IssueDate, CURDATE()) FROM plane WHERE TailNum IN (
+	SELECT TailNum FROM ontime ORDER BY ArrDelay DESC LIMIT 10
+);
+-- ERROR 1235 (42000): This version of MySQL doesn't yet support
+--                     'LIMIT & IN/ALL/ANY/SOME subquery'
+SELECT DATEDIFF(IssueDate, CURDATE()) FROM plane WHERE TailNum IN (
+	SELECT * FROM (
+		SELECT TailNum FROM ontime ORDER BY ArrDelay DESC LIMIT 10
+	) AS temp
+);
+-- +--------------------------------+
+-- | DATEDIFF(IssueDate, CURDATE()) |
+-- +--------------------------------+
+-- |                          -8741 |
+-- |                          -7800 |
+-- |                          -8675 |
+-- |                          -6304 |
+-- |                          -3293 |
+-- |                          -3231 |
+-- +--------------------------------+
+-- 6 rows in set (1 min 45.33 sec)
+SELECT DATEDIFF(IssueDate, CURDATE()) FROM plane WHERE TailNum IN (
+	SELECT * FROM (
+		SELECT TailNum FROM ontime ORDER BY ArrDelay ASC LIMIT 10
+	) AS temp
+);
+-- +--------------------------------+
+-- | DATEDIFF(IssueDate, CURDATE()) |
+-- +--------------------------------+
+-- |                          -8200 |
+-- |                          -7598 |
+-- |                          -7352 |
+-- |                          -7218 |
+-- |                          -4373 |
+-- |                          -4349 |
+-- |                          -4608 |
+-- |                          -4533 |
+-- +--------------------------------+
+-- 8 rows in set (1 min 11.22 sec)
 
 # 幫助教訂正英文有加分嗎 ^__^
 # 這份題目裡的英文幾乎沒有一句是寫對的欸QQ

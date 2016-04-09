@@ -132,13 +132,13 @@ SELECT COUNT(*) FROM (SELECT DISTINCT Origin, Dest FROM ontime) AS temp;
 #      and contain “BETWEEN” syntax in the usage of SQL.
 
 SELECT COUNT(*) FROM ontime WHERE
-	Dest = 'JFK' AND (ActualElapsedTime BETWEEN 1 AND 3);
+	Dest = 'JFK' AND (ActualElapsedTime BETWEEN 1*60 AND 3*60);
 -- +----------+
 -- | COUNT(*) |
 -- +----------+
--- |        1 |
+-- |   303868 |
 -- +----------+
--- 1 row in set (6.08 sec)
+-- 1 row in set (36.54 sec)
 
 # Q3 - Please list both the aircraft type names and the amounts
 #      whose aircraft type name begins with “737”
@@ -200,14 +200,15 @@ SELECT Model, COUNT(Model) FROM plane WHERE Model LIKE '737%' GROUP BY Model;
 
 # Q4 - Please list the average speed (using the actual arrival time)
 #      of all aircraft types and contain “AVG” in the usage of SQL.
-#
-# The data are too huge for my computer (Intel Pentium 2020M with 4GB RAM) to process.
-# I had executed this query for more than 30 minutes.
+# 
+# The data are too huge for my computer (Intel Pentium 2020M w/ 3.7GiB RAM) to process.
+# I had executed this query for more than 30 minutes
+# and the system resources were almost used up.
 
 ALTER TABLE ontime ADD INDEX TailNum (TailNum);
 -- Query OK, 0 rows affected (7 min 27.65 sec)
 -- Records: 0  Duplicates: 0  Warnings: 0
-SELECT plane.Model, AVG(ontime.Distance/ontime.ActualElapsedTime) AS AvgSpeed
+SELECT plane.Model, AVG(ontime.Distance/ontime.ActualElapsedTime*60) AS AvgSpeed
 	FROM plane INNER JOIN ontime ON plane.TailNum = ontime.TailNum
 	GROUP BY plane.Model;
 -- ^CCtrl-C -- sending "KILL QUERY 5" to server ...
@@ -218,9 +219,38 @@ SELECT plane.Model, AVG(ontime.Distance/ontime.ActualElapsedTime) AS AvgSpeed
 #      by the timezone count of routes (assume one timezone is formed by 15 degree
 #      longitude and is not related to countries) in decreasing order
 #      and contain “ORDER BY” in the usage of SQL.
+# 
+# The data are too huge for my computer (Intel Pentium 2020M w/ 3.7GiB RAM) to process.
+# I had executed this query for more than 30 minutes
+# and the system resources were almost used up.
 
-SELECT ABS(temp1.Lon-temp2.Lon)/15 AS Timezone, ontime.Origin, ontime.Dest FROM ontime
+SELECT DISTINCT
+	FLOOR(ABS(temp1.Lon-temp2.Lon)/15) AS Timezone, ontime.Origin, ontime.Dest
+	FROM ontime
 	INNER JOIN airport AS temp1 ON ontime.Origin = temp1.Iata
 	INNER JOIN airport AS temp2 ON ontime.Dest = temp2.Iata
 	ORDER BY Timezone DESC, ontime.Origin ASC, ontime.Dest ASC
 	LIMIT 0, 50;
+-- ^CCtrl-C -- sending "KILL QUERY 5" to server ...
+-- Ctrl-C -- query aborted.
+-- ERROR 1317 (70100): Query execution was interrupted
+
+# Q6 - Please list the aircraft types which never appeared after 2008 (appeared before)
+#      and contain “NOT IN” syntax in the usage of SQL.
+
+SELECT DISTINCT plane.Model FROM plane
+	INNER JOIN ontime ON plane.TailNum = ontime.TailNum
+	WHERE plane.Model NOT IN (
+		SELECT DISTINCT plane.Model FROM plane
+		INNER JOIN ontime ON plane.TailNum = ontime.TailNum
+		WHERE ontime.Year >= 2008
+	);
+-- ^CCtrl-C -- sending "KILL QUERY 5" to server ...
+-- Ctrl-C -- query aborted.
+-- ERROR 1317 (70100): Query execution was interrupted
+SELECT DISTINCT Model FROM plane WHERE TailNum IN (
+	SELECT DISTINCT TailNum FROM ontime WHERE TailNum NOT IN (
+		SELECT DISTINCT TailNum FROM ontime WHERE Year >= 2008
+	)
+);
+-- Empty set (1 min 55.69 sec)

@@ -254,3 +254,40 @@ SELECT DISTINCT Model FROM plane WHERE TailNum IN (
 	)
 );
 -- Empty set (1 min 55.69 sec)
+
+# Q7 - Please list the manufacturers whose airplanes’ delay times
+#      are more than half an hour.
+# 
+# The data are too huge for my computer (Intel Pentium 2020M w/ 3.7GiB RAM) to process.
+# I had executed this query for more than 30 minutes
+# and the system resources were almost used up.
+
+SELECT plane.Manufacturer, AVG(ontime.ArrDelay)
+	FROM plane INNER JOIN ontime ON plane.TailNum = ontime.TailNum
+	GROUP BY plane.Manufacturer
+	HAVING AVG(ontime.ArrDelay) > 30;
+-- ^CCtrl-C -- sending "KILL QUERY 5" to server ...
+-- Ctrl-C -- query aborted.
+-- ERROR 1317 (70100): Query execution was interrupted
+
+# Q8 - Please list the average delay time of a week (7 days) and
+#      a day (24 hours), and when is the best time to fly
+#      (having the minimum delay).
+
+SELECT DayOfWeek, AVG(ArrDelay) FROM ontime GROUP BY DayOfWeek;
+-- +-----------+---------------+
+-- | DayOfWeek | AVG(ArrDelay) |
+-- +-----------+---------------+
+-- |         1 |        8.4854 |
+-- |         2 |        6.4295 |
+-- |         3 |        7.6126 |
+-- |         4 |        9.8577 |
+-- |         5 |       10.5425 |
+-- |         6 |        4.4603 |
+-- |         7 |        7.9931 |
+-- +-----------+---------------+
+-- 7 rows in set (1 min 52.20 sec)
+
+# 幫助教訂正英文有加分嗎 ^__^
+# 這份題目裡的英文幾乎沒有一句是寫對的欸QQ
+# 幾乎所有關係代名詞跟名詞單複數都用錯...

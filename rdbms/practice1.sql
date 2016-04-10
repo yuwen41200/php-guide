@@ -21,7 +21,7 @@
 # 
 # $ mysql -u root -p --local-infile
 
-# Q0 - Import the datasets.
+# Q-1 - Import the datasets.
 
 SHOW DATABASES;
 USE assignments;
@@ -115,6 +115,16 @@ LOAD DATA LOCAL INFILE '/tmp/airports.csv'
 	IGNORE 1 LINES;
 -- Query OK, 3376 rows affected (0.78 sec)
 -- Records: 3376  Deleted: 0  Skipped: 0  Warnings: 0
+
+# Q0 - How many records are in the dataset?
+
+SELECT COUNT(*) FROM ontime;
+-- +----------+
+-- | COUNT(*) |
+-- +----------+
+-- | 35874731 |
+-- +----------+
+-- 1 row in set (15.29 sec)
 
 # Q1 - Please list the number of all different routes (origin -> destination)
 #      and contain “DISTINCT” syntax in the usage of SQL.
@@ -278,7 +288,7 @@ SELECT plane.Manufacturer, AVG(ontime.ArrDelay)
 #      a day (24 hours), and when is the best time to fly
 #      (having the minimum delay).
 # 
-# The best day is Friday (day 6) and the best hour is 5 o'clock.
+# The best day is Saturday (day 6) and the best hour is 5 o'clock.
 
 SELECT DayOfWeek, AVG(ArrDelay) FROM ontime GROUP BY DayOfWeek;
 -- +-----------+---------------+
@@ -368,6 +378,38 @@ SELECT DATEDIFF(IssueDate, CURDATE()) FROM plane WHERE TailNum IN (
 -- |                          -4533 |
 -- +--------------------------------+
 -- 8 rows in set (1 min 11.22 sec)
+
+# Q10 - How well does weather or season predict plane delay?
+# 
+# Let's find the correlation between arrival delay and weather delay.
+# The correlation coefficient is 0.29, which means a weak positive correlation.
+
+SELECT
+	@AvgArrDelay := AVG(ArrDelay), @AvgWeatherDelay := AVG(WeatherDelay),
+	@StdArrDelay := STDDEV_SAMP(ArrDelay), @StdWeatherDelay := STDDEV_SAMP(WeatherDelay)
+FROM
+	ontime;
+-- +--------------+------------------+-------------------+-------------------+
+-- | @AvgArrDelay | @AvgWeatherDelay | @StdArrDelay      | @StdWeatherDelay  |
+-- +--------------+------------------+-------------------+-------------------+
+-- |  7.990401238 |      0.696268886 | 36.12799877414426 | 8.868056284288038 |
+-- +--------------+------------------+-------------------+-------------------+
+-- 1 row in set (57.54 sec)
+SELECT 
+	SUM( (ArrDelay-@AvgArrDelay)*(WeatherDelay-@AvgWeatherDelay) ) /
+	( (COUNT(ArrDelay)-1)*@StdArrDelay*@StdWeatherDelay )
+FROM
+	ontime;
+-- +------------------------------------------------+
+-- | SUM( (ArrDelay-@AvgArrDelay)*(WeatherDelay-... |
+-- +------------------------------------------------+
+-- |                             0.2854138548147738 |
+-- +------------------------------------------------+
+-- 1 row in set (1 min 5.08 sec)
+
+# Q11 - Can you detect cascading failures
+# as delay in one airport creates delay in another?
+# Are there critical links in the system?
 
 # 幫助教訂正英文有加分嗎 ^__^
 # 這份題目裡的英文幾乎沒有一句是寫對的欸QQ

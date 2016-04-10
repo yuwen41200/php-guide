@@ -382,8 +382,7 @@ SELECT DATEDIFF(IssueDate, CURDATE()) FROM plane WHERE TailNum IN (
 SELECT
 	@AvgArrDelay := AVG(ArrDelay), @AvgWeatherDelay := AVG(WeatherDelay),
 	@StdArrDelay := STDDEV_SAMP(ArrDelay), @StdWeatherDelay := STDDEV_SAMP(WeatherDelay)
-FROM
-	ontime;
+	FROM ontime;
 -- +--------------+------------------+-------------------+-------------------+
 -- | @AvgArrDelay | @AvgWeatherDelay | @StdArrDelay      | @StdWeatherDelay  |
 -- +--------------+------------------+-------------------+-------------------+
@@ -393,8 +392,7 @@ FROM
 SELECT 
 	SUM( (ArrDelay-@AvgArrDelay)*(WeatherDelay-@AvgWeatherDelay) ) /
 	( (COUNT(ArrDelay)-1)*@StdArrDelay*@StdWeatherDelay )
-FROM
-	ontime;
+	FROM ontime;
 -- +------------------------------------------------+
 -- | SUM( (ArrDelay-@AvgArrDelay)*(WeatherDelay-... |
 -- +------------------------------------------------+
@@ -402,9 +400,39 @@ FROM
 -- +------------------------------------------------+
 -- 1 row in set (1 min 5.08 sec)
 
-# Q11 - Can you detect cascading failures
+# Q11 - Can you detect cascaded failures
 #       as delay in one airport causes delay in another?
 #       Are there any critical links in the system?
+# 
+# This plane went through DEN -> SEA -> SFO -> RNO on 2004-09-01.
+# However, the first flight was seriously delayed,
+# leading to cascaded delay in the second and the third flight.
+# (Although the duration of the second and the third flight is as scheduled.)
+
+SELECT CRSDepTime, DepTime, DepDelay, CRSArrTime, ArrTime, ArrDelay
+	FROM assignments.ontime
+	WHERE Year = 2004 AND Month = 9 AND DayOfMonth = 1
+	AND TailNum = 'N530UA' AND LateAircraftDelay > 0;
+-- +------------+---------+----------+------------+---------+----------+
+-- | CRSDepTime | DepTime | DepDelay | CRSArrTime | ArrTime | ArrDelay |
+-- +------------+---------+----------+------------+---------+----------+
+-- |       1434 |    1623 |      109 |       1612 |    1803 |      111 |
+-- |       1712 |    1846 |       94 |       1908 |    2042 |       94 |
+-- |       2008 |    2114 |       66 |       2058 |    2204 |       66 |
+-- +------------+---------+----------+------------+---------+----------+
+-- 3 rows in set (0.02 sec)
+SELECT CRSElapsedTime, ActualElapsedTime, LateAircraftDelay, Origin, Dest
+	FROM assignments.ontime
+	WHERE Year = 2004 AND Month = 9 AND DayOfMonth = 1
+	AND TailNum = 'N530UA' AND LateAircraftDelay > 0;
+-- +----------------+-------------------+-------------------+--------+------+
+-- | CRSElapsedTime | ActualElapsedTime | LateAircraftDelay | Origin | Dest |
+-- +----------------+-------------------+-------------------+--------+------+
+-- |            158 |               160 |               106 | DEN    | SEA  |
+-- |            116 |               116 |                94 | SEA    | SFO  |
+-- |             50 |                50 |                66 | SFO    | RNO  |
+-- +----------------+-------------------+-------------------+--------+------+
+-- 3 rows in set (0.02 sec)
 
 # Q12 - Feel free to think.
 #       Write down any valuable observation with explanation.

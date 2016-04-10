@@ -213,6 +213,9 @@ SELECT Model, COUNT(Model) FROM plane WHERE Model LIKE '737%' GROUP BY Model;
 ALTER TABLE ontime ADD INDEX TailNum (TailNum);
 -- Query OK, 0 rows affected (7 min 27.65 sec)
 -- Records: 0  Duplicates: 0  Warnings: 0
+ALTER TABLE plane ADD INDEX TailNum (TailNum);
+-- Query OK, 0 rows affected (0.76 sec)
+-- Records: 0  Duplicates: 0  Warnings: 0
 SELECT plane.Model, AVG(ontime.Distance/ontime.ActualElapsedTime*60) AS AvgSpeed
 	FROM plane INNER JOIN ontime ON plane.TailNum = ontime.TailNum
 	GROUP BY plane.Model;

@@ -1,23 +1,18 @@
-# $ lsb_release -d
-# Description:	Ubuntu 15.10
+# $ sudo lsb_release -d
+#   Description:    Ubuntu 15.10
 # 
-# $ free -h
-#              total       used       free     shared    buffers     cached
-# Mem:          3.7G       2.6G       1.1G       257M       108M       1.4G
-# -/+ buffers/cache:       1.1G       2.7G
-# 置換：         1.9G       642M       1.2G
+# $ sudo cat /proc/cpuinfo | grep model\ name
+#   model name    : Intel(R) Pentium(R) CPU 2020M @ 2.40GHz
+#   model name    : Intel(R) Pentium(R) CPU 2020M @ 2.40GHz
 # 
-# $ df -h
-# 檔案系統          容量   已用  可用  已用% 掛載點
-# udev            1.9G     0  1.9G    0% /dev
-# tmpfs           384M  6.4M  378M    2% /run
-# /dev/sda6       183G   45G  130G   26% /
-# tmpfs           1.9G  4.7M  1.9G    1% /dev/shm
-# tmpfs           5.0M  4.0K  5.0M    1% /run/lock
-# tmpfs           1.9G     0  1.9G    0% /sys/fs/cgroup
-# /dev/sda1       296M   58M  239M   20% /boot/efi
-# /dev/sda9       119G  4.9G  108G    5% /home
-# tmpfs           384M   80K  384M    1% /run/user/1000
+# $ sudo free -h
+#                total       used       free     shared    buffers     cached
+#   Mem:          3.7G       3.4G       338M       278M        46M       2.5G
+#   -/+ buffers/cache:       934M       2.8G
+#   Swap:         1.9G       955M       952M
+# 
+# $ sudo lshw -short -class disk | grep sda
+#   /0/2/0.0.0       /dev/sda    disk           500GB Hitachi HTS54505
 # 
 # $ mysql -u root -p --local-infile
 
@@ -211,7 +206,7 @@ SELECT Model, COUNT(Model) FROM plane WHERE Model LIKE '737%' GROUP BY Model;
 # Q4 - Please list the average speed (using the actual arrival time)
 #      of all aircraft types and contain “AVG” in the usage of SQL.
 # 
-# The data are too huge for my computer (Intel Pentium 2020M w/ 3.7GiB RAM) to process.
+# The data are too huge for my computer to process.
 # I had executed this query for more than 30 minutes
 # and the system resources were almost used up.
 
@@ -230,7 +225,7 @@ SELECT plane.Model, AVG(ontime.Distance/ontime.ActualElapsedTime*60) AS AvgSpeed
 #      longitude and is not related to countries) in decreasing order
 #      and contain “ORDER BY” in the usage of SQL.
 # 
-# The data are too huge for my computer (Intel Pentium 2020M w/ 3.7GiB RAM) to process.
+# The data are too huge for my computer to process.
 # I had executed this query for more than 30 minutes
 # and the system resources were almost used up.
 
@@ -272,7 +267,7 @@ SELECT DISTINCT Model FROM plane WHERE TailNum IN (
 # Q7 - Please list the manufacturers whose airplanes’ delay times
 #      are more than half an hour.
 # 
-# The data are too huge for my computer (Intel Pentium 2020M w/ 3.7GiB RAM) to process.
+# The data are too huge for my computer to process.
 # I had executed this query for more than 30 minutes
 # and the system resources were almost used up.
 
@@ -408,8 +403,84 @@ FROM
 -- 1 row in set (1 min 5.08 sec)
 
 # Q11 - Can you detect cascading failures
-# as delay in one airport creates delay in another?
-# Are there critical links in the system?
+#       as delay in one airport causes delay in another?
+#       Are there any critical links in the system?
+
+# Q12 - Feel free to think.
+#       Write down any valuable observation with explanation.
+# 
+# The most convenient airport in the United States in 2008
+# is William B Hartsfield-Atlanta Intl in Atlanta, GA.
+# We can head for 173 different airports there.
+
+CREATE TEMPORARY TABLE IF NOT EXISTS temp AS (
+	SELECT Origin, COUNT(DISTINCT Dest) AS DestCount
+	FROM ontime WHERE Year = 2008 GROUP BY Origin
+);
+-- Query OK, 303 rows affected (1 min 33.62 sec)
+-- Records: 303  Duplicates: 0  Warnings: 0
+SELECT airport.Airport AS AirportName,
+	CONCAT(airport.City, ', ', airport.State) AS Location,
+	temp.DestCount AS AccessibleAirportCount
+	FROM airport
+	INNER JOIN temp ON airport.Iata = temp.Origin
+	ORDER BY AccessibleAirportCount DESC
+	LIMIT 0, 50;
+-- +------------------------------------+-----------------------+---------------+
+-- | AirportName                        | Location              | Accessible... |
+-- +------------------------------------+-----------------------+---------------+
+-- | William B Hartsfield-Atlanta Intl  | Atlanta, GA           |           173 |
+-- | Chicago O'Hare International       | Chicago, IL           |           149 |
+-- | Dallas-Fort Worth International    | Dallas-Fort Worth, TX |           134 |
+-- | Denver Intl                        | Denver, CO            |           127 |
+-- | Minneapolis-St Paul Intl           | Minneapolis, MN       |           126 |
+-- | Detroit Metropolitan-Wayne County  | Detroit, MI           |           118 |
+-- | George Bush Intercontinental       | Houston, TX           |           114 |
+-- | Salt Lake City Intl                | Salt Lake City, UT    |           114 |
+-- | Cincinnati Northern Kentucky Intl  | Covington, KY         |           113 |
+-- | Newark Intl                        | Newark, NJ            |            92 |
+-- | McCarran International             | Las Vegas, NV         |            91 |
+-- | Los Angeles International          | Los Angeles, CA       |            90 |
+-- | Orlando International              | Orlando, FL           |            89 |
+-- | Phoenix Sky Harbor International   | Phoenix, AZ           |            88 |
+-- | Charlotte/Douglas International    | Charlotte, NC         |            82 |
+-- | Memphis International              | Memphis, TN           |            79 |
+-- | Cleveland-Hopkins Intl             | Cleveland, OH         |            75 |
+-- | San Francisco International        | San Francisco, CA     |            74 |
+-- | Washington Dulles International    | Chantilly, VA         |            71 |
+-- | John F Kennedy Intl                | New York, NY          |            68 |
+-- | Baltimore-Washington International | Baltimore, MD         |            65 |
+-- | Gen Edw L Logan Intl               | Boston, MA            |            63 |
+-- | Tampa International                | Tampa, FL             |            62 |
+-- | Philadelphia Intl                  | Philadelphia, PA      |            61 |
+-- | LaGuardia                          | New York, NY          |            60 |
+-- | Fort Lauderdale-Hollywood Int'l    | Ft. Lauderdale, FL    |            58 |
+-- | Seattle-Tacoma Intl                | Seattle, WA           |            56 |
+-- | Chicago Midway                     | Chicago, IL           |            54 |
+-- | San Diego International-Lindbergh  | San Diego, CA         |            54 |
+-- | General Mitchell International     | Milwaukee, WI         |            53 |
+-- | Ronald Reagan Washington National  | Arlington, VA         |            52 |
+-- | Kansas City International          | Kansas City, MO       |            52 |
+-- | Austin-Bergstrom International     | Austin, TX            |            52 |
+-- | Lambert-St Louis International     | St Louis, MO          |            50 |
+-- | Nashville International            | Nashville, TN         |            49 |
+-- | Miami International                | Miami, FL             |            48 |
+-- | Portland Intl                      | Portland, OR          |            45 |
+-- | San Antonio International          | San Antonio, TX       |            43 |
+-- | Raleigh-Durham International       | Raleigh, NC           |            43 |
+-- | New Orleans International          | New Orleans, LA       |            41 |
+-- | Indianapolis International         | Indianapolis, IN      |            40 |
+-- | Albuquerque International          | Albuquerque, NM       |            38 |
+-- | Port Columbus Intl                 | Columbus, OH          |            38 |
+-- | Sacramento International           | Sacramento, CA        |            37 |
+-- | Southwest Florida International    | Ft. Myers, FL         |            35 |
+-- | Jacksonville International         | Jacksonville, FL      |            35 |
+-- | Metropolitan Oakland International | Oakland, CA           |            34 |
+-- | Pittsburgh International           | Pittsburgh, PA        |            34 |
+-- | William P Hobby                    | Houston, TX           |            33 |
+-- | Bradley International              | Windsor Locks, CT     |            33 |
+-- +------------------------------------+-----------------------+---------------+
+-- 50 rows in set (0.11 sec)
 
 # 幫助教訂正英文有加分嗎 ^__^
 # 這份題目裡的英文幾乎沒有一句是寫對的欸QQ

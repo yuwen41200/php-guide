@@ -227,10 +227,6 @@ SELECT plane.Model, AVG(ontime.Distance/ontime.ActualElapsedTime*60) AS AvgSpeed
 #      by the timezone count of routes (assume one timezone is formed by 15 degree
 #      longitude and is not related to countries) in decreasing order
 #      and contain “ORDER BY” in the usage of SQL.
-# 
-# The data are too huge for my computer to process.
-# I had executed this query for more than 30 minutes
-# and the system resources were almost used up.
 
 SELECT DISTINCT
 	FLOOR(ABS(temp1.Lon-temp2.Lon)/15) AS Timezone, ontime.Origin, ontime.Dest
@@ -242,6 +238,67 @@ SELECT DISTINCT
 -- ^CCtrl-C -- sending "KILL QUERY 5" to server ...
 -- Ctrl-C -- query aborted.
 -- ERROR 1317 (70100): Query execution was interrupted
+SELECT FLOOR(ABS(temp1.Lon-temp2.Lon)/15) AS Timezone, temp0.Origin, temp0.Dest
+	FROM (SELECT DISTINCT Origin, Dest FROM ontime) AS temp0
+	INNER JOIN (SELECT Iata, Lon FROM airport) AS temp1 ON temp0.Origin = temp1.Iata
+	INNER JOIN (SELECT Iata, Lon FROM airport) AS temp2 ON temp0.Dest = temp2.Iata
+	ORDER BY Timezone DESC, temp0.Origin ASC, temp0.Dest ASC
+	LIMIT 0, 50;
+-- +----------+--------+------+
+-- | Timezone | Origin | Dest |
+-- +----------+--------+------+
+-- |        5 | EWR    | HNL  |
+-- |        5 | HNL    | EWR  |
+-- |        4 | ANC    | ATL  |
+-- |        4 | ANC    | CVG  |
+-- |        4 | ANC    | DTW  |
+-- |        4 | ANC    | ORD  |
+-- |        4 | ATL    | ANC  |
+-- |        4 | ATL    | HNL  |
+-- |        4 | ATL    | OGG  |
+-- |        4 | CVG    | ANC  |
+-- |        4 | CVG    | HNL  |
+-- |        4 | DFW    | HNL  |
+-- |        4 | DTW    | ANC  |
+-- |        4 | DTW    | HNL  |
+-- |        4 | HNL    | ATL  |
+-- |        4 | HNL    | CVG  |
+-- |        4 | HNL    | DFW  |
+-- |        4 | HNL    | DTW  |
+-- |        4 | HNL    | IAH  |
+-- |        4 | HNL    | MSP  |
+-- |        4 | HNL    | ORD  |
+-- |        4 | IAH    | HNL  |
+-- |        4 | IAH    | OGG  |
+-- |        4 | KOA    | ORD  |
+-- |        4 | MSP    | HNL  |
+-- |        4 | OGG    | ATL  |
+-- |        4 | OGG    | IAH  |
+-- |        4 | OGG    | ORD  |
+-- |        4 | ORD    | ANC  |
+-- |        4 | ORD    | HNL  |
+-- |        4 | ORD    | OGG  |
+-- |        3 | ANC    | DEN  |
+-- |        3 | ANC    | DFW  |
+-- |        3 | ANC    | IAH  |
+-- |        3 | ANC    | MSP  |
+-- |        3 | BDL    | LAX  |
+-- |        3 | BOS    | LAX  |
+-- |        3 | BOS    | LGB  |
+-- |        3 | BOS    | OAK  |
+-- |        3 | BOS    | ONT  |
+-- |        3 | BOS    | PDX  |
+-- |        3 | BOS    | SAN  |
+-- |        3 | BOS    | SEA  |
+-- |        3 | BOS    | SFO  |
+-- |        3 | BOS    | SJC  |
+-- |        3 | BWI    | OAK  |
+-- |        3 | BWI    | SEA  |
+-- |        3 | BWI    | SFO  |
+-- |        3 | BWI    | SJC  |
+-- |        3 | DCA    | SEA  |
+-- +----------+--------+------+
+-- 50 rows in set (1 min 47.67 sec)
 
 # Q6 - Please list the aircraft types which never appeared after 2008 (appeared before)
 #      and contain “NOT IN” syntax in the usage of SQL.
@@ -279,6 +336,23 @@ SELECT plane.Manufacturer, AVG(ontime.ArrDelay)
 	GROUP BY plane.Manufacturer
 	HAVING AVG(ontime.ArrDelay) > 30;
 -- ^CCtrl-C -- sending "KILL QUERY 5" to server ...
+-- Ctrl-C -- query aborted.
+-- ERROR 1317 (70100): Query execution was interrupted
+SELECT Manufacturer FROM (
+	SELECT Manufacturer, AVG(ontime.ArrDelay) AS AvgArrDelay
+	FROM plane FORCE INDEX (TailNum)
+	INNER JOIN ontime FORCE INDEX (TailNum) ON plane.TailNum = ontime.TailNum
+	GROUP BY Manufacturer
+) AS temp WHERE AvgArrDelay > 30;
+-- ^CCtrl-C -- sending "KILL QUERY 3" to server ...
+-- Ctrl-C -- query aborted.
+-- ERROR 1317 (70100): Query execution was interrupted
+SELECT Manufacturer FROM (
+	SELECT Manufacturer, AVG(ontime.ArrDelay) AS AvgArrDelay
+	FROM plane INNER JOIN ontime ON plane.TailNum = ontime.TailNum
+	GROUP BY Manufacturer
+) AS temp WHERE AvgArrDelay > 30;
+-- ^CCtrl-C -- sending "KILL QUERY 3" to server ...
 -- Ctrl-C -- query aborted.
 -- ERROR 1317 (70100): Query execution was interrupted
 

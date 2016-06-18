@@ -11,11 +11,13 @@ void db::init() {
 
 void db::setTempFileDir(string dir) {
 	tempFileDir = dir;
+	string cacheName = tempFileDir + "/cache.bin";
+	remove(cacheName.c_str()); // clear old data if exists
 }
 
 void db::import(string csvName) {
 	string cacheName = tempFileDir + "/cache.bin";
-	FILE *cacheFile = fopen(cacheName.c_str(), "wb");
+	FILE *cacheFile = fopen(cacheName.c_str(), "ab");
 	FILE *csvFile = fopen(csvName.c_str(), "r");
 
 	parse(csvFile, cacheFile);
@@ -69,6 +71,9 @@ double db::query(string origin, string dest) {
 	}
 
 	fclose(cacheFile);
+	#ifdef DEBUG
+    printf("DEBUG: sum = %d, count = %lu\n", sum, index[search].size());
+    #endif
 	return (double) sum / index[search].size();
 }
 
@@ -132,5 +137,8 @@ double db::bruteForceSearch(FILE* fpIn, string str) {
 			fseek(fpIn, sizeof(int), SEEK_CUR);
 	}
 	fclose(fpIn);
+	#ifdef DEBUG
+	printf("DEBUG: sum = %d, count = %d\n", sum, count);
+	#endif
 	return (double) sum / count;
 }

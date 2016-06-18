@@ -1,5 +1,4 @@
 #include <ctime>
-#include <iostream>
 #include "db.h"
 
 using namespace std;
@@ -29,28 +28,28 @@ int main() {
 	double result5 = myDb.query("LAX", "IAH");
 
 	clock_t time6 = clock();
-	printf("Import Time: %.2fs\n", (double) (time0 - timex) / CLOCKS_PER_SEC);
-	printf("Index Time: %.2fs\n\n", (double) (time1 - time0) / CLOCKS_PER_SEC);
+	printf("Import Time: %.3fs\n", (double) (time0 - timex) / CLOCKS_PER_SEC);
+	printf("Index Time: %.3fs\n\n", (double) (time1 - time0) / CLOCKS_PER_SEC);
 
 	printf("##### IAH -> JFK #####\n");
-	printf("Average Arrival Delay: %.2f\n", result1);
-	printf("Query Time: %.2fs\n\n", (double) (time2 - time1) / CLOCKS_PER_SEC);
+	printf("Average Arrival Delay: %.5f\n", result1);
+	printf("Query Time: %.3fs\n\n", (double) (time2 - time1) / CLOCKS_PER_SEC);
 
 	printf("##### IAH -> LAX #####\n");
-	printf("Average Arrival Delay: %.2f\n", result2);
-	printf("Query Time: %.2fs\n\n", (double) (time3 - time2) / CLOCKS_PER_SEC);
+	printf("Average Arrival Delay: %.5f\n", result2);
+	printf("Query Time: %.3fs\n\n", (double) (time3 - time2) / CLOCKS_PER_SEC);
 
 	printf("##### JFK -> LAX #####\n");
-	printf("Average Arrival Delay: %.2f\n", result3);
-	printf("Query Time: %.2fs\n\n", (double) (time4 - time3) / CLOCKS_PER_SEC);
+	printf("Average Arrival Delay: %.5f\n", result3);
+	printf("Query Time: %.3fs\n\n", (double) (time4 - time3) / CLOCKS_PER_SEC);
 
 	printf("##### JFK -> IAH #####\n");
-	printf("Average Arrival Delay: %.2f\n", result4);
-	printf("Query Time: %.2fs\n\n", (double) (time5 - time4) / CLOCKS_PER_SEC);
+	printf("Average Arrival Delay: %.5f\n", result4);
+	printf("Query Time: %.3fs\n\n", (double) (time5 - time4) / CLOCKS_PER_SEC);
 
 	printf("##### LAX -> IAH #####\n");
-	printf("Average Arrival Delay: %.2f\n", result5);
-	printf("Query Time: %.2fs\n\n", (double) (time6 - time5) / CLOCKS_PER_SEC);
+	printf("Average Arrival Delay: %.5f\n", result5);
+	printf("Query Time: %.3fs\n\n", (double) (time6 - time5) / CLOCKS_PER_SEC);
 
 	myDb.cleanup();
 	return 0;

@@ -72,8 +72,8 @@ double db::query(string origin, string dest) {
 
 	fclose(cacheFile);
 	#ifdef DEBUG
-    printf("DEBUG: sum = %d, count = %lu\n", sum, index[search].size());
-    #endif
+	printf("DEBUG: sum = %d, count = %lu\n", sum, index[search].size());
+	#endif
 	return (double) sum / index[search].size();
 }
 

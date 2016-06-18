@@ -26,8 +26,10 @@ int main() {
 	double result4 = myDb.query("JFK", "IAH");
 	clock_t time5 = clock();
 	double result5 = myDb.query("LAX", "IAH");
-
 	clock_t time6 = clock();
+	double result6 = myDb.query("ATL", "MCI");
+
+	clock_t time7 = clock();
 	printf("Import Time: %.3fs\n", (double) (time0 - timex) / CLOCKS_PER_SEC);
 	printf("Index Time: %.3fs\n\n", (double) (time1 - time0) / CLOCKS_PER_SEC);
 
@@ -50,6 +52,10 @@ int main() {
 	printf("##### LAX -> IAH #####\n");
 	printf("Average Arrival Delay: %.5f\n", result5);
 	printf("Query Time: %.3fs\n\n", (double) (time6 - time5) / CLOCKS_PER_SEC);
+
+	printf("##### ATL -> MCI #####\n");
+	printf("Average Arrival Delay: %.5f\n", result6);
+	printf("Query Time: %.3fs\n\n", (double) (time7 - time6) / CLOCKS_PER_SEC);
 
 	myDb.cleanup();
 	return 0;

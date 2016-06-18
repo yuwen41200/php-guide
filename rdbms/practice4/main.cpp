@@ -14,7 +14,7 @@ int main() {
 	myDb.import("data/2008.csv");
 
 	clock_t time0 = clock();
-	// myDb.createIndex();
+	myDb.createIndex();
 
 	clock_t time1 = clock();
 	double result1 = myDb.query("IAH", "JFK");

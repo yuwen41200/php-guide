@@ -1,4 +1,7 @@
+#include <cstdio>
 #include <string>
+
+using namespace std;
 
 class db {
 
@@ -9,5 +12,10 @@ public:
 	void createIndex();
 	double query(std::string, std::string);
 	void cleanup();
+
+private:
+	string tempFileDir;
+	bool isIndexed;
+	void parse(FILE*, FILE*);
 
 };

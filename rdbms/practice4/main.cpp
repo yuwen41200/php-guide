@@ -4,11 +4,15 @@
 
 using namespace std;
 
-int main(int argc, char** argv) {
+int main() {
 	db myDb;
 	myDb.init();
 	myDb.setTempFileDir("temp");
-	myDb.import("data");
+
+	clock_t timex = clock();
+	myDb.import("data/2006.csv");
+	myDb.import("data/2007.csv");
+	myDb.import("data/2008.csv");
 
 	clock_t time0 = clock();
 	myDb.createIndex();
@@ -25,6 +29,7 @@ int main(int argc, char** argv) {
 	double result5 = myDb.query("LAX", "IAH");
 
 	clock_t time6 = clock();
+	printf("Import Time: %.2fs\n", (double) (time0 - timex) / CLOCKS_PER_SEC);
 	printf("Index Time: %.2fs\n\n", (double) (time1 - time0) / CLOCKS_PER_SEC);
 
 	printf("##### IAH -> JFK #####\n");

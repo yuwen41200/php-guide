@@ -1,7 +1,5 @@
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <string>
 #include "db.h"
 
 using namespace std;
@@ -15,41 +13,70 @@ void db::setTempFileDir(string dir) {
 	tempFileDir = dir;
 }
 
-void db::import(string csvDir) {
+void db::import(string csvName) {
 	string cacheName = tempFileDir + "/cache.bin";
 	FILE *cacheFile = fopen(cacheName.c_str(), "wb");
-
-	string csvName = csvDir + "/2006.csv";
 	FILE *csvFile = fopen(csvName.c_str(), "r");
-	parse(csvFile, cacheFile);
-	fclose(csvFile);
 
-	csvName = csvDir + "/2007.csv";
-	csvFile = fopen(csvName.c_str(), "r");
 	parse(csvFile, cacheFile);
-	fclose(csvFile);
 
-	csvName = csvDir + "/2008.csv";
-	csvFile = fopen(csvName.c_str(), "r");
-	parse(csvFile, cacheFile);
 	fclose(csvFile);
-
 	fclose(cacheFile);
 }
 
 void db::createIndex() {
+	char key[7] = "";
+	long value;
+
+	string cacheName = tempFileDir + "/cache.bin";
+	FILE *cacheFile = fopen(cacheName.c_str(), "rb");
+	if (!cacheFile) {
+		perror("db::createIndex() file open failed");
+		abort();
+	}
+
+	while (true) {
+		fread(key, sizeof(char), 6, cacheFile);
+		if (feof(cacheFile))
+			break;
+		value = ftell(cacheFile);
+		index[key].push_back(value);
+		fseek(cacheFile, sizeof(int), SEEK_CUR);
+	}
+
+	fclose(cacheFile);
 	isIndexed = true;
-	// Create index.
 }
 
 double db::query(string origin, string dest) {
-	// Do the query and return the average ArrDelay of flights from origin to dest.
-	// This method will be called multiple times.
-	return 0; //Remember to return your result.
+	string search = origin + dest;
+	int found = 0, sum = 0;
+
+	string cacheName = tempFileDir + "/cache.bin";
+	FILE *cacheFile = fopen(cacheName.c_str(), "rb");
+	if (!cacheFile) {
+		perror("db::query() file open failed");
+		abort();
+	}
+
+	if (!isIndexed)
+		return bruteForceSearch(cacheFile, search);
+
+	for (auto const &pos : index[search]) {
+		fseek(cacheFile, pos, SEEK_SET);
+		fread(&found, sizeof(int), 1, cacheFile);
+		sum += found;
+	}
+
+	fclose(cacheFile);
+	return (double) sum / index[search].size();
 }
 
 void db::cleanup() {
-	// Release memory, close files and anything you should do to clean up your db class.
+	if (isIndexed) {
+		index.clear();
+		isIndexed = false;
+	}
 }
 
 void db::parse(FILE *fpIn, FILE *fpOut) {
@@ -72,16 +99,38 @@ void db::parse(FILE *fpIn, FILE *fpOut) {
 			strtok(NULL, ",");
 			strtok(NULL, ",");
 			char *arrDelay = strtok(NULL, ",");
+			int intArrDelay = atoi(arrDelay);
+			if (intArrDelay == 0 && strchr(arrDelay, '0') == NULL)
+				continue; // arrDelay is empty or N/A
 			strtok(NULL, ",");
 			char *origin = strtok(NULL, ",");
 			char *dest = strtok(NULL, ",");
 			fwrite(origin, sizeof(char), 3, fpOut);
 			fwrite(dest, sizeof(char), 3, fpOut);
-			fwrite(atoi(arrDelay), sizeof(int), 1, fpOut);
+			fwrite(&intArrDelay, sizeof(int), 1, fpOut);
 		}
 	}
 	else {
-		perror("invalid file pointer");
+		perror("db::parse() file open failed");
 		abort();
 	}
+}
+
+double db::bruteForceSearch(FILE* fpIn, string str) {
+	char key[7] = "";
+	int value = 0, sum = 0, count = 0;
+	while (true) {
+		fread(key, sizeof(char), 6, fpIn);
+		if (feof(fpIn))
+			break;
+		if (str == key) {
+			fread(&value, sizeof(int), 1, fpIn);
+			sum += value;
+			++count;
+		}
+		else
+			fseek(fpIn, sizeof(int), SEEK_CUR);
+	}
+	fclose(fpIn);
+	return (double) sum / count;
 }

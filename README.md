@@ -1,3 +1,3 @@
-#php-guide
+# PHP Guide
 
 Useful PHP Code Snippets
